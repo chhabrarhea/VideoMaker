@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.videomaker.util.BitmapHelper;
+import com.github.squti.androidwaverecorder.WaveRecorder;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -30,7 +31,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class RecordAudioActivity extends AppCompatActivity {
-    private static MediaRecorder mediaRecorder;
+//    private static MediaRecorder mediaRecorder;
     private static MediaPlayer mediaPlayer;
     private RelativeLayout root1;
     private static String audioFilePath;
@@ -42,6 +43,7 @@ public class RecordAudioActivity extends AppCompatActivity {
     private boolean isRecording = false;
     private boolean isStarted = false;
     private int pos;
+    private WaveRecorder recorder;
     private final int permission=100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,7 @@ public class RecordAudioActivity extends AppCompatActivity {
 
 
          pos=getIntent().getIntExtra("position",-1);
-        audioFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio"+pos+".3gp";
+        audioFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio"+pos+".wav";
     }
 
     protected boolean hasMicrophone() {
@@ -87,20 +89,24 @@ public class RecordAudioActivity extends AppCompatActivity {
         stopButton.setEnabled(true);
         playButton.setEnabled(false);
         recordButton.setEnabled(false);
-        chronometer.start();
+
 
         try {
-            mediaRecorder = new MediaRecorder();
-            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_2_TS);
-            mediaRecorder.setOutputFile(audioFilePath);
-            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            mediaRecorder.prepare();
+//            mediaRecorder = new MediaRecorder();
+//            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+//            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_2_TS);
+//            mediaRecorder.setOutputFile(audioFilePath);
+//            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+//            mediaRecorder.prepare();
+            recorder=new WaveRecorder(audioFilePath);
+            recorder.startRecording();
+            chronometer.start();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        mediaRecorder.start();
+//        mediaRecorder.start();
     }
 
     public void pauseAudio(View view)
@@ -118,11 +124,12 @@ public class RecordAudioActivity extends AppCompatActivity {
         if (isRecording)
         {
             chronometer.stop();
+            recorder.startRecording();
             recordButton.setEnabled(false);
-            mediaRecorder.stop();
-            mediaRecorder.reset();
-            mediaRecorder.release();
-            mediaRecorder = null;
+//            mediaRecorder.stop();
+//            mediaRecorder.reset();
+//            mediaRecorder.release();
+//            mediaRecorder = null;
             isRecording = false;
         } else {
             mediaPlayer.release();
