@@ -30,7 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class RecordAudioActivity extends AppCompatActivity {
+public class RecordAudioActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener {
 //    private static MediaRecorder mediaRecorder;
     private static MediaPlayer mediaPlayer;
     private RelativeLayout root1;
@@ -124,7 +124,7 @@ public class RecordAudioActivity extends AppCompatActivity {
         if (isRecording)
         {
             chronometer.stop();
-            recorder.startRecording();
+            recorder.stopRecording();
             recordButton.setEnabled(false);
 //            mediaRecorder.stop();
 //            mediaRecorder.reset();
@@ -153,15 +153,10 @@ public class RecordAudioActivity extends AppCompatActivity {
 
             inputStream.close();
             mediaPlayer.prepareAsync();
-
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mp.start();
-                    isStarted=true;
-                }
-
-
+            mediaPlayer.setOnCompletionListener(this);
+            mediaPlayer.setOnPreparedListener(mp -> {
+                mp.start();
+                isStarted=true;
             });
         }
         else
@@ -171,7 +166,6 @@ public class RecordAudioActivity extends AppCompatActivity {
             pauseButton.setEnabled(true);
         }
 
-        Log.i("record",""+mediaPlayer.getDuration());
     }
 
     public void saveAudio(View view) {
@@ -203,6 +197,7 @@ public class RecordAudioActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                     }).show();
+
         }
     }
     @Override
@@ -210,5 +205,11 @@ public class RecordAudioActivity extends AppCompatActivity {
         super.onDestroy();
         mediaPlayer.stop();
         mediaPlayer.release();
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        playButton.setEnabled(true);
+        pauseButton.setEnabled(false);
     }
 }
