@@ -104,7 +104,8 @@ public class BitmapHelper {
     private void saveImage(Bitmap finalBitmap) {
 
         String root = Environment.getExternalStorageDirectory().toString();
-        File myDir = new File(root + "/saved_images");
+        File myDir = new File(root ,"VideoMaker");
+        if (!myDir.exists())
         myDir.mkdirs();
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());

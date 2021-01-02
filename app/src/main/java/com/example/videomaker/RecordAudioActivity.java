@@ -79,7 +79,7 @@ public class RecordAudioActivity extends AppCompatActivity {
 
 
          pos=getIntent().getIntExtra("position",-1);
-        audioFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audio"+pos+".wav";
+        audioFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/VideoMaker/audio"+pos+".wav";
     }
 
     protected boolean hasMicrophone() {

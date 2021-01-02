@@ -54,6 +54,7 @@ BitmapHelper helper;
             image+="file '"+b.get(i)+"'\n";
             Log.i("MyActivity",audio+" "+image);
         }
+        image+="file '"+b.get(b.size()-1)+"'";
         Log.i("MyFiles","Files Created");
         byte[] bytes=audio.getBytes();
         byte[] bytes1=image.getBytes();
@@ -66,7 +67,8 @@ BitmapHelper helper;
         }
     }
     private void generateVideo(){
-        int rc = FFmpeg.execute("ffmpeg -r 24 -f concat -safe 0 -i "+file2.getAbsolutePath()+" -f concat -safe 0 -i "+file1.getAbsolutePath()+" -c:a aac -pix_fmt yuv420p -crf 23 -r 24 -shortest -y video-from-frames.mp4");
+        String outputPath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/VideoMaker/outputVideo.mp4";
+        int rc = FFmpeg.execute(" -r 24 -f concat -safe 0 -i "+file2.getPath()+" -f concat -safe 0 -i "+file1.getPath()+" -c:a aac -pix_fmt yuv420p -crf 23 -r 24 -shortest -y "+outputPath);
         if (rc == RETURN_CODE_SUCCESS) {
             Log.i("MyActivity", "Command execution completed successfully.");
             Toast.makeText(this, "Video Generated", Toast.LENGTH_SHORT).show();
