@@ -3,9 +3,11 @@ package com.example.videomaker;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import com.example.videomaker.util.BitmapHelper;
 import com.example.videomaker.util.SegmentAdapter;
@@ -28,4 +30,17 @@ SegmentAdapter segmentAdapter;
         recyclerView.setAdapter(segmentAdapter);
 
     }
+
+    public void generateVideo(View view)
+    {
+        BitmapHelper helper=BitmapHelper.getInstance();
+        if (helper.allAudioAdded()){
+         helper.saveTempBitmap();
+        Intent intent=new Intent(SegmentListActivity.this,VideoActivity.class);
+        startActivity(intent);
+        }
+        else
+            Toast.makeText(this, "Select Audio for all Images", Toast.LENGTH_SHORT).show();
+    }
+
 }

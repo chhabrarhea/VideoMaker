@@ -22,6 +22,8 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.arthenica.mobileffmpeg.Config;
+import com.arthenica.mobileffmpeg.FFmpeg;
 import com.example.videomaker.util.BitmapHelper;
 import com.github.squti.androidwaverecorder.WaveRecorder;
 import com.google.android.material.snackbar.Snackbar;
@@ -29,6 +31,9 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL;
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 
 public class RecordAudioActivity extends AppCompatActivity {
 //    private static MediaRecorder mediaRecorder;
@@ -81,16 +86,11 @@ public class RecordAudioActivity extends AppCompatActivity {
         PackageManager pmanager = this.getPackageManager();
         return pmanager.hasSystemFeature(
                 PackageManager.FEATURE_MICROPHONE); }
-
-
-    public void recordAudio (View view) throws IOException
-    {
+    public void recordAudio (View view) throws IOException {
         isRecording = true;
         stopButton.setEnabled(true);
         playButton.setEnabled(false);
         recordButton.setEnabled(false);
-
-
         try {
 //            mediaRecorder = new MediaRecorder();
 //            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
@@ -108,15 +108,12 @@ public class RecordAudioActivity extends AppCompatActivity {
 
 //        mediaRecorder.start();
     }
-
-    public void pauseAudio(View view)
-    {
+    public void pauseAudio(View view) {
         mediaPlayer.pause();
         pauseButton.setEnabled(false);
         playButton.setEnabled(true);
     }
-    public void stopAudio (View view)
-    {
+    public void stopAudio (View view) {
 
         stopButton.setEnabled(false);
         playButton.setEnabled(true);
@@ -124,7 +121,7 @@ public class RecordAudioActivity extends AppCompatActivity {
         if (isRecording)
         {
             chronometer.stop();
-            recorder.startRecording();
+            recorder.stopRecording();
             recordButton.setEnabled(false);
 //            mediaRecorder.stop();
 //            mediaRecorder.reset();
@@ -137,8 +134,7 @@ public class RecordAudioActivity extends AppCompatActivity {
             recordButton.setEnabled(true);
         }
     }
-    public void playAudio (View view) throws IOException
-    {
+    public void playAudio (View view) throws IOException {
         if(!isStarted){
             playButton.setEnabled(false);
             pauseButton.setEnabled(true);
@@ -173,17 +169,10 @@ public class RecordAudioActivity extends AppCompatActivity {
 
         Log.i("record",""+mediaPlayer.getDuration());
     }
-
     public void saveAudio(View view) {
-    BitmapHelper helper=BitmapHelper.getInstance();
-    helper.addAudio(audioFilePath,pos);
-    Intent intent=new Intent(RecordAudioActivity.this,SegmentDetailActivity.class);
-    intent.putExtra("position",pos);
-    startActivity(intent);
+    convertFile(new File(audioFilePath));
 }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode==permission && grantResults[0]==PackageManager.PERMISSION_GRANTED)
         {
@@ -205,10 +194,44 @@ public class RecordAudioActivity extends AppCompatActivity {
                     }).show();
         }
     }
-    @Override
-    public void onDestroy() {
+    @Override public void onDestroy() {
         super.onDestroy();
-        mediaPlayer.stop();
-        mediaPlayer.release();
+    }
+    private void convertFile(File file) {
+        if(file == null || !file.exists()){
+            Toast.makeText(this, "File does not exists", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(!file.canRead()){
+            Log.i("MyActivity","Can't read the file. Missing permission?");
+            return;
+        }
+        File convert=getConvertedFilePath(file,"mp3");
+        int rc = FFmpeg.execute("-y -i "+file.getPath()+" "+convert.getPath());
+        if (rc == RETURN_CODE_SUCCESS) {
+            Log.i(Config.TAG, "Command execution completed successfully.");
+            storeURI(convert);
+        } else if (rc == RETURN_CODE_CANCEL) {
+            Log.i(Config.TAG, "Command execution cancelled by user.");
+        } else {
+            Log.i(Config.TAG, String.format("Command execution failed with rc=%d and the output below.", rc));
+            Config.printLastCommandOutput(Log.INFO);
+        }
+    }
+    private static File getConvertedFilePath(File originalFile, String format){
+        String[] f = originalFile.getPath().split("\\.");
+        String filePath = originalFile.getPath().replace(f[f.length - 1], format);
+        return new File(filePath);
+    }
+
+    public void storeURI(File file)
+    {
+        BitmapHelper helper=BitmapHelper.getInstance();
+        helper.addAudio(file.getAbsolutePath(),pos,file.getName());
+        Log.i("Selected",file.getAbsolutePath()+" "+file.getPath());
+        Intent intent=new Intent(RecordAudioActivity.this,SegmentDetailActivity.class);
+        intent.putExtra("position",pos);
+        startActivity(intent);
+        finish();
     }
 }

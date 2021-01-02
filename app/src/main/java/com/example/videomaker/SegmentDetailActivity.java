@@ -6,7 +6,6 @@ import androidx.loader.content.CursorLoader;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.AudioFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -86,7 +85,6 @@ String audioURI;
     }
     public void chooseAudio(View view){
         Intent intent_upload = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-
         startActivityForResult(intent_upload,1);
     }
     @Override
@@ -96,7 +94,7 @@ String audioURI;
 
             if(resultCode == RESULT_OK){
                 Uri uri = data.getData();
-                String path = _getRealPathFromURI(SegmentDetailActivity.this, data.getData());
+                String path = getRealPathFromURI(SegmentDetailActivity.this, uri);
                 File audio = new File(path);
                     convertFile(audio);
             }
@@ -117,6 +115,7 @@ String audioURI;
         int rc = FFmpeg.execute("-y -i "+file.getPath()+" "+convert.getPath());
         if (rc == RETURN_CODE_SUCCESS) {
             Log.i(Config.TAG, "Command execution completed successfully.");
+            storeURI(convert);
         } else if (rc == RETURN_CODE_CANCEL) {
             Log.i(Config.TAG, "Command execution cancelled by user.");
         } else {
@@ -131,13 +130,14 @@ String audioURI;
         return new File(filePath);
     }
 
-    public void storeURI(File file)
-    {
+    public void storeURI(File file) {
         BitmapHelper helper=BitmapHelper.getInstance();
-        helper.addAudio(file.getAbsolutePath(),pos);
+        helper.addAudio(file.getAbsolutePath(),pos,file.getName());
+
         Log.i("Selected",file.getAbsolutePath()+" "+file.getPath());
     }
-    private String _getRealPathFromURI(Context context, Uri contentUri) {
+
+    private String getRealPathFromURI(Context context, Uri contentUri) {
         String[] proj = { MediaStore.Audio.Media.DATA };
         CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
         Cursor cursor = loader.loadInBackground();

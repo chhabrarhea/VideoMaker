@@ -3,16 +3,14 @@
     package="com.example.videomaker">
 
     <application
-
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VideoMaker.NoActionBar">
-
-        <activity android:name=".RecordAudioActivity"></activity>
+        <activity android:name=".VideoActivity"></activity>
+        <activity android:name=".RecordAudioActivity" />
         <activity android:name=".SegmentDetailActivity" />
         <activity android:name=".SegmentListActivity" />
         <activity
@@ -36,10 +34,10 @@
                 android:resource="@xml/provider_paths" />
         </provider>
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
 </manifest>
