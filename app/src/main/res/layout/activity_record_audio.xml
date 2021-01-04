@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/root"
+    android:fitsSystemWindows="true"
     tools:context=".RecordAudioActivity">
 <Chronometer
     android:layout_width="wrap_content"
@@ -28,6 +29,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_mic_24"
             android:onClick="recordAudio"
+
             android:backgroundTint="@android:color/transparent"
             android:id="@+id/recordButton"/>
         <ImageButton
@@ -39,18 +41,25 @@
             android:backgroundTint="@android:color/transparent"
             android:id="@+id/stopButton"/>
     </LinearLayout>
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_below="@id/linear1"
-        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_centerHorizontal="true">
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Play"
         android:layout_marginTop="10dp"
         android:id="@+id/playButton"
+        android:drawableTint="@color/white"
         android:onClick="playAudio"
+       android:textAppearance="@style/drawableTint"
         android:paddingHorizontal="30dp"
         android:drawableLeft="@drawable/ic_baseline_play_arrow_24"
-        android:drawablePadding="20dp"
+        android:drawablePadding="15dp"
         android:background="@drawable/button"/>
     <Button
         android:layout_width="wrap_content"
@@ -60,22 +69,27 @@
         android:text="Pause"
         android:layout_marginTop="10dp"
         android:id="@+id/pauseButton"
+        android:textAppearance="@style/drawableTint"
         android:onClick="pauseAudio"
         android:paddingHorizontal="30dp"
+        android:drawableTint="@color/white"
         android:drawableLeft="@drawable/ic_baseline_pause_24"
         android:drawablePadding="15dp"
         android:background="@drawable/button"/>
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Save"
         android:layout_below="@id/pauseButton"
+        android:drawableTint="@color/white"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:background="@drawable/button"
         android:paddingHorizontal="30dp"
+        android:textAppearance="@style/drawableTint"
         android:onClick="saveAudio"
+        android:id="@+id/save"
         android:drawableLeft="@drawable/ic_baseline_save_24"
         android:drawablePadding="20dp"/>
-
+    </LinearLayout>
 </RelativeLayout>

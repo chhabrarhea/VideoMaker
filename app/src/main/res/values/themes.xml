@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.VideoMaker" parent="Theme.AppCompat">
+    <style name="Theme.VideoMaker" parent="Theme.MaterialComponents.DayNight">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -18,5 +18,14 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+    <style name="text" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="drawableTint" parent="Widget.AppCompat.ImageButton">
+        <item name="android:textColor">@color/design_default_color_on_primary</item>
+        <item name="android:drawableTint">@color/design_default_color_on_primary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>

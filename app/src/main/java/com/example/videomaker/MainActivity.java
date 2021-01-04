@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.snackbar.Snackbar;
@@ -87,10 +88,12 @@ private Uri uri;
    }
    public void startCamera(View view)
    {
-       if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED)
+       if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED)
        {
-           ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA},CAMERA);
+           ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE},CAMERA);
        }
+       else if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED)
+           ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA},CAMERA);
        else
            try {
                openCamera();
@@ -122,26 +125,31 @@ private Uri uri;
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && data != null) {
+        Log.i("CAMERA",requestCode+" "+resultCode);
+        if (data==null)
+        {
+            Log.i("camera","null");
+        }
+        if (resultCode == RESULT_OK) {
             try {
                 Log.i(TAG,"final try block");
                 if (requestCode == FROM_CAMERA) {
                         uri = Uri.parse(mCurrentPhotoPath);
                         Log.i(TAG,uri.toString());
-                        Glide.with(this).load(uri).into(image);
+                        Glide.with(this).load(uri.toString()).into(image);
                         root2.setVisibility(View.VISIBLE);
                         root1.setVisibility(View.GONE);
                     }
-                if (requestCode == FROM_GALLERY) {
+                if (requestCode == FROM_GALLERY && data!=null) {
 
                     uri = data.getData();
-                    Glide.with(MainActivity.this).asDrawable().load(uri).centerCrop().into(image);
+                    Glide.with(MainActivity.this).load(uri.toString()).into(image);
                     root2.setVisibility(View.VISIBLE);
                     root1.setVisibility(View.GONE);
 
@@ -202,5 +210,12 @@ private Uri uri;
             Intent intent=new Intent(MainActivity.this,SplitImageActivity.class);
             intent.putExtra("uri",uri.toString());
             startActivity(intent);
+        }
+
+        public void goBack(View v)
+        {
+            root2.setVisibility(View.GONE);
+            root1.setVisibility(View.VISIBLE);
+            uri=null;
         }
     }

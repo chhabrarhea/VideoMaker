@@ -22,7 +22,9 @@ public class BitmapHelper {
     private ArrayList<Bitmap> bitmapArrayList;
     private String[] audioURI;
     private String[] audioName;
+    private int[] audioDuration;
     private ArrayList<String> imageName;
+    String [] tempFiles;
     private BitmapHelper()
     {
         bitmapArrayList=new ArrayList<>();
@@ -51,18 +53,27 @@ public class BitmapHelper {
 
     public synchronized void  setBitmapArrayList(ArrayList<Bitmap> bitmapArrayList) {
         this.bitmapArrayList = bitmapArrayList;
-        this.audioURI=new String[bitmapArrayList.size()];
+        this.audioURI=new String[this.bitmapArrayList.size()];
         this.imageName=new ArrayList<>();
-        this.audioName=new String[bitmapArrayList.size()];
+        this.audioName=new String[this.bitmapArrayList.size()];
+        this.audioDuration=new int[this.bitmapArrayList.size()];
+        this.tempFiles=new String[3];
     }
 
+    public void setTempFiles(String[] tempFiles) {
+        this.tempFiles = tempFiles;
+    }
 
-
-    public void addAudio(String uri, int pos,String name)
+    public void addAudio(String uri, int pos, String name, int duration)
     {
         if (pos<this.audioURI.length)
         this.audioURI[pos]=uri;
         this.audioName[pos]=name;
+        this.audioDuration[pos]=duration;
+    }
+
+    public int[] getAudioDuration() {
+        return audioDuration;
     }
 
     public Bitmap getBitmap(int pos)
@@ -97,19 +108,19 @@ public class BitmapHelper {
     public void saveTempBitmap() {
 
         if (isExternalStorageWritable()) {
-            for (Bitmap bitmap: bitmapArrayList)
-            saveImage(bitmap);
+            for (int i=0;i<bitmapArrayList.size();i++)
+            saveImage(bitmapArrayList.get(i),i);
         }
     }
-    private void saveImage(Bitmap finalBitmap) {
+    private void saveImage(Bitmap finalBitmap,int i) {
 
-        String root = Environment.getExternalStorageDirectory().toString();
-        File myDir = new File(root ,"VideoMaker");
+        String root = Environment.getExternalStorageDirectory().getAbsolutePath();
+        File myDir = new File(root ,"VideoMaker11");
         if (!myDir.exists())
         myDir.mkdirs();
 
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String fname = "VideoMaker_"+ timeStamp +".jpg";
+
+        String fname = "VideoMaker_"+i +".jpg";
 
         File file = new File(myDir, fname);
         if (file.exists()) file.delete ();
@@ -132,6 +143,25 @@ public class BitmapHelper {
         return false;
     }
 
+    public void deleteTempFiles()
+    {
+        for (String path:this.tempFiles)
+        {
+            if (new File(path).exists())
+                new File(path).deleteOnExit();
+        }
+        for (String path:this.audioURI)
+        {
+            if (new File(path).exists())
+                new File(path).deleteOnExit();
+        }
 
+        for (String name:this.imageName)
+        {
+            String path=Environment.getExternalStorageDirectory().getAbsolutePath()+"/VideoMaker11/"+name;
+            if (new File(path).exists())
+                new File(path).deleteOnExit();
+        }
+    }
 }
 

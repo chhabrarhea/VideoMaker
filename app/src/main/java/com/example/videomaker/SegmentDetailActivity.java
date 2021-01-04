@@ -6,9 +6,11 @@ import androidx.loader.content.CursorLoader;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -36,11 +38,16 @@ LinearLayout linearLayout;
 MediaPlayer mediaPlayer;
 boolean started=false;
 String audioURI;
+String audioFilePath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_segment_detail);
+        File file=new File(Environment.getExternalStorageDirectory().getAbsolutePath(),"VideoMaker11");
+        if (!file.exists())
+        file.mkdir();
         pos=getIntent().getIntExtra("position",-1);
+        audioFilePath = file.getPath()+"/audio"+pos+".wav";
         helper=BitmapHelper.getInstance();
         ImageView display=findViewById(R.id.image);
         mediaPlayer = new MediaPlayer();
@@ -50,7 +57,14 @@ String audioURI;
         display.setImageBitmap(helper.getBitmap(pos));
         audioURI=helper.getAudio(pos);
         if (audioURI==null)
-            linearLayout.setVisibility(View.GONE);}
+            linearLayout.setVisibility(View.GONE);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                  play.setImageDrawable(getDrawable(R.drawable.ic_baseline_play_arrow_24));
+            }
+        });
+    }
     public void playAudio(View view) throws IOException {
         if (!started)
         {
@@ -111,10 +125,11 @@ String audioURI;
             return;
         }
 
-        File convert=getConvertedFilePath(file,"mp3");
-        int rc = FFmpeg.execute("-y -i "+file.getPath()+" "+convert.getPath());
+
+        int rc = FFmpeg.execute("-y -i '"+file.getPath()+"' "+audioFilePath);
         if (rc == RETURN_CODE_SUCCESS) {
             Log.i(Config.TAG, "Command execution completed successfully.");
+            File convert=new File(audioFilePath);
             storeURI(convert);
         } else if (rc == RETURN_CODE_CANCEL) {
             Log.i(Config.TAG, "Command execution cancelled by user.");
@@ -124,17 +139,14 @@ String audioURI;
         }
         }
 
-    private static File getConvertedFilePath(File originalFile, String format){
-        String[] f = originalFile.getPath().split("\\.");
-        String filePath = originalFile.getPath().replace(f[f.length - 1], format);
-        return new File(filePath);
-    }
+
 
     public void storeURI(File file) {
         BitmapHelper helper=BitmapHelper.getInstance();
-        helper.addAudio(file.getAbsolutePath(),pos,file.getName());
-
-        Log.i("Selected",file.getAbsolutePath()+" "+file.getPath());
+        helper.addAudio(file.getAbsolutePath(),pos,file.getName(),getDuration(file));
+        Log.i("MyActivity",pos+"");
+        audioURI=file.getAbsolutePath();
+        linearLayout.setVisibility(View.VISIBLE);
     }
 
     private String getRealPathFromURI(Context context, Uri contentUri) {
@@ -144,4 +156,11 @@ String audioURI;
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
         cursor.moveToFirst();
         return cursor.getString(column_index);}
+
+    private static Integer getDuration(File file) {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(file.getAbsolutePath());
+        String durationStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        return Integer.parseInt(durationStr)/1000;
+    }
 }

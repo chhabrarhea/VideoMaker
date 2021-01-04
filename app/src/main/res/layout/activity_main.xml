@@ -3,25 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="#fff"
     android:layout_height="match_parent"
+     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/linear1"
+        android:backgroundTint="@null"
         android:layout_centerInParent="true">
 <Button
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/button"
+    android:backgroundTint="@null"
     android:text="Camera"
-    android:textColor="@color/black"
+    android:textAppearance="@style/drawableTint"
+    android:textColor="@color/white"
     android:padding="10dp"
     android:textAllCaps="false"
     android:onClick="startCamera"
-    android:drawableTint="#000"
     android:drawableLeft="@drawable/ic_baseline_camera_24"
     android:drawablePadding="20dp"
     android:id="@+id/camera"/>
@@ -30,10 +32,10 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button"
             android:text="Gallery"
-            android:drawableTint="@color/black"
-            android:textColor="@color/black"
+            android:textAppearance="@style/drawableTint"
             android:layout_marginLeft="50dp"
             android:textAllCaps="false"
+            android:backgroundTint="@null"
             android:onClick="startGallery"
             android:padding="10dp"
             android:drawableLeft="@drawable/ic_baseline_photo_library_24"
@@ -44,26 +46,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
+        android:fitsSystemWindows="true"
         android:id="@+id/relative1">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/arrow_back"
+            android:backgroundTint="@android:color/transparent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:id="@+id/back"
+            android:onClick="goBack"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="end"
+            android:src="@drawable/check"
+            android:id="@+id/check"
+            android:onClick="splitImage"
+            android:backgroundTint="@android:color/transparent"/>
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="100dp"
+            android:layout_marginBottom="50dp"
+            android:layout_below="@id/check"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
             android:scaleType="fitXY"
             android:id="@+id/display"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-           android:layout_alignParentBottom="true"
-            android:layout_marginBottom="40dp"
-            android:paddingHorizontal="10dp"
-            android:background="@drawable/button"
-            android:text="Split Image"
-            android:textColor="@color/black"
-            android:onClick="splitImage"
-            android:textAllCaps="false"
-            android:textSize="18sp"
-           android:layout_centerHorizontal="true"/>
+
 
 
     </RelativeLayout>
